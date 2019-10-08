@@ -13,24 +13,26 @@ class LinkedList {
 
       const node = new Node(data);
 
-      if (this.length === 0){
+      if (!this._head){
         this._head = node;
-        this._tail = node;
       } else {
-        node.prev = this._tail;
         this._tail.next = node;
-        this._tail = node;
+        node.prev = this._tail;
+
       }
+
+      this._tail = node;
       this.length++;
+      return this;
     }
 
 
     head() {
-      return this._head.data;
+      return (this._head) ? this._head.data : null;
     }
 
     tail() {
-      return this._head.data;
+      return (this._tail) ? this._tail.data : null;
     }
 
     at(index) {
@@ -46,24 +48,21 @@ class LinkedList {
     }
 
     insertAt(index, data) {
-      let current = this._head;
-      let i = 1;
-      let node = new Node(data);
-      if (index === 0) {
-        this._head.prev = node;
-        node.next = this._head;
-        this._head = node;
+      if (!this._head) {
+        this.append(data);
+        return this;
       } else {
-          while(current) {
-            current = current.next;
-            if (i === index){
-              node.prev = current.prev;
-              current.prev.next = node;
-              node.next = current;
-              current.prev = node;
-            }
-            i++;
-          }
+        let current = this._head;
+        let i = 0;
+
+        while (i < index) {
+          current = current.next;
+          i++;
+        }
+        const node = new Node(data, current.prev, current);
+        current.prev.next = node;
+        current.prev = node;
+        return this;
       }
       this.length++;
     }
@@ -73,12 +72,27 @@ class LinkedList {
     }
 
     clear() {
-      this._head.data = null;
-      this._tail.data = null;
+      this._head = null;
+      this._tail = null;
       this.length = 0;
+      return this;
     }
 
     deleteAt(index) {
+      if(index < 0 || this.length <= index) {
+        return null;
+      }
+
+      if (index === 0) {
+        this._head = this._head.next;
+        if(this._head === null) {
+          this._tail = null;
+        } else {
+          this._head.prev = null;
+        }
+        return this;
+      }
+
       let current = this._head;
       let i = 0;
       let prev = null;
@@ -91,12 +105,18 @@ class LinkedList {
 
       prev.next = current.next;
       current.next.prev = prev;
+      this.length--;
+      return this;
     }
 
     reverse() {
       let current = this._head;
       let prev = null;
       let next = null;
+
+      if (this.length === 1) {
+        return this;
+      }
 
       while(current) {
         next = current.next;
@@ -127,4 +147,3 @@ class LinkedList {
 }
 
 module.exports = LinkedList;
-
